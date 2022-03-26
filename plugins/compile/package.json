@@ -38,6 +38,7 @@
     "bin": "fontsource",
     "dirname": "fontsource",
     "commands": "./dist/commands",
+    "default": "compile",
     "plugins": [
       "@oclif/plugin-help",
       "@oclif/plugin-plugins"
