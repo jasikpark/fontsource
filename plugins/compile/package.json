@@ -1,0 +1,69 @@
+{
+  "name": "@fontsource/plugin-compile",
+  "version": "0.0.0",
+  "description": "Fontsource CLI",
+  "author": "DecliningLotus @DecliningLotus",
+  "bin": {
+    "fontsource": "./bin/run"
+  },
+  "homepage": "https://github.com/fontsource/fontsource",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "repository": "fontsource/fontsource",
+  "files": [
+    "/bin",
+    "/dist",
+    "/npm-shrinkwrap.json",
+    "/oclif.manifest.json"
+  ],
+  "dependencies": {
+    "@oclif/core": "^1",
+    "@oclif/plugin-help": "^5",
+    "@oclif/plugin-plugins": "^2.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^16.9.4",
+    "eslint": "^7.32.0",
+    "eslint-config-oclif": "^4",
+    "eslint-config-oclif-typescript": "^1.0.2",
+    "globby": "^11",
+    "oclif": "^2",
+    "shx": "^0.3.3",
+    "stdout-stderr": "^0.1.13",
+    "ts-node": "^10.2.1",
+    "tslib": "^2.3.1",
+    "typescript": "^4.4.3"
+  },
+  "oclif": {
+    "bin": "fontsource",
+    "dirname": "fontsource",
+    "commands": "./dist/commands",
+    "plugins": [
+      "@oclif/plugin-help",
+      "@oclif/plugin-plugins"
+    ],
+    "topicSeparator": " ",
+    "topics": {
+      "hello": {
+        "description": "Say hello to the world and others"
+      }
+    }
+  },
+  "scripts": {
+    "build": "shx rm -rf dist && tsc -b",
+    "lint": "eslint . --ext .ts --config .eslintrc",
+    "postpack": "shx rm -f oclif.manifest.json",
+    "posttest": "yarn lint",
+    "prepack": "yarn build && oclif manifest && oclif readme",
+    "test": "jest",
+    "version": "oclif readme && git add README.md"
+  },
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "bugs": "https://github.com/fontsource/fontsource/issues",
+  "keywords": [
+    "oclif"
+  ],
+  "types": "dist/index.d.ts"
+}
