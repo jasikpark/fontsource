@@ -1,4 +1,5 @@
 import { Command, Flags } from "@oclif/core";
+import { fontPaths } from "../utils/fontPaths";
 
 export default class Compile extends Command {
   static strict = false; // Allows for a variable number of arguments
@@ -63,6 +64,9 @@ export default class Compile extends Command {
       .map(arg => arg.input)
       .join(":")
       .split(":");
+
+    // Verify if font is installed
+    fontPaths(fonts);
 
     console.dir(raw);
     this.log(fonts.join(" "));
