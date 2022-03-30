@@ -3,6 +3,7 @@ import { fontPaths } from "../utils/fontPaths";
 
 export default class Compile extends Command {
   static strict = false; // Allows for a variable number of arguments
+
   static description = "The main compile command.";
 
   static examples = ["<%= config.bin %> <%= command.id %>"];
@@ -60,7 +61,7 @@ export default class Compile extends Command {
     // All args are fonts to use - hooks into raw object which joins the args as "arg1:arg2:arg3"
     // Filter map is used just in case the order of type args and flags changed
     const fonts = raw
-      .filter(arg => arg.type == "arg")
+      .filter(arg => arg.type === "arg")
       .map(arg => arg.input)
       .join(":")
       .split(":");

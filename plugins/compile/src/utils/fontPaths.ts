@@ -1,17 +1,18 @@
-import resolveFrom from "resolve-from";
+import path from "path";
 
 const fontPaths = (nameArr: string[]) => {
   const paths: string[] = [];
   for (let name of nameArr) {
     if (!name.includes("@fontsource/")) {
-      name = "@fontsource/" + name;
+      name = `@fontsource/${name}`;
     }
 
     try {
-      console.log(resolveFrom(process.cwd(), name));
+      // eslint-disable-next-line unicorn/prefer-module
+      const packagePath = require.resolve(name);
+      console.log(path.dirname(packagePath));
     } catch {
-      console.error(`${name} is not found`);
-      process.exit();
+      throw new Error(`${name} is not found.`);
     }
   }
 };
