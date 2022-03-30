@@ -1,7 +1,7 @@
 import jsonfile from "jsonfile";
 import path from "path";
 
-import { getDirectories } from "./utils";
+import { getDirectories } from "../utils/utils";
 
 const subsets: string[] = [];
 

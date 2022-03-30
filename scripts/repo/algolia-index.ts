@@ -2,7 +2,7 @@ import algoliasearch from "algoliasearch";
 import jsonfile from "jsonfile";
 import * as dotenv from "dotenv";
 
-import { getDirectories } from "./utils";
+import { getDirectories } from "../utils/utils";
 
 interface Metadata {
   objectID: string;

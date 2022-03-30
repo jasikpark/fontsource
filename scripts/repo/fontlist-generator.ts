@@ -2,7 +2,7 @@ import * as _ from "lodash";
 import fs from "fs-extra";
 import jsonfile from "jsonfile";
 
-import { getDirectories } from "./utils";
+import { getDirectories } from "../utils/utils";
 
 interface FontList {
   [x: string]: string;
