@@ -19,7 +19,7 @@ jobs:
         run: yarn util:fontlist
 
       - name: Generate Algolia index
-        run: yarn util:algolia
+        run: yarn repo:algolia
         env:
           ALGOLIA_ADMIN_KEY: ${{ secrets.ALGOLIA_ADMIN_KEY }}
 
