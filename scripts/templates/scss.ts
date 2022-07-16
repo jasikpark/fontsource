@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
-import { template } from "lodash";
 import { APIv2, APIVariable } from "google-font-metadata";
+import { template } from "lodash";
 
 const scssMixins = template(
   `$fontName: "<%= fontName %>";
@@ -219,4 +219,4 @@ const generateSCSS = (id: string, variableFlag: boolean): string => {
   });
 };
 
-export { scssMixins, scssGeneric, generateSCSS, unicodeMapGen };
+export { generateSCSS, scssGeneric, scssMixins, unicodeMapGen };

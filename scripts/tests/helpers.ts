@@ -1,15 +1,15 @@
 import fs from "fs-extra";
-import path from "path";
+import path from "node:path";
 
 // Return file names
 const readDir = (dirPath: string, extension: string): string[] => {
   const fileArr: string[] = [];
-  fs.readdirSync(dirPath).forEach(file => {
+  for (const file of fs.readdirSync(dirPath)) {
     const fileExtension = file.split(".")[1];
     if (extension === fileExtension) {
       fileArr.push(file);
     }
-  });
+  }
 
   return fileArr;
 };
@@ -18,14 +18,14 @@ const readDir = (dirPath: string, extension: string): string[] => {
 const readDirContents = (dirPath: string, fileNames: string[]): string[] => {
   const fileContents: string[] = [];
 
-  fileNames.forEach(file => {
+  for (const file of fileNames) {
     const content = fs
       .readFileSync(path.join(dirPath, file))
       .toString()
       // Remove whitespace due to possible diffs
       .replace(/\s/g, "");
     fileContents.push(content);
-  });
+  }
   return fileContents;
 };
 

@@ -1,8 +1,9 @@
+import consola from "consola"
 import fs from "fs-extra";
 import glob from "glob";
 
-import { packager } from "./generic-packager";
 import { config } from "./config";
+import { packager } from "./generic-packager";
 
 const {
   fontId,
@@ -24,8 +25,8 @@ fs.ensureDirSync(`${fontDir}/files`);
 
 // Move files into package dir
 fs.copy(fontFileDir, `${fontDir}/files`, err => {
-  if (err) return console.error(err);
-  return console.log("Copied files into package.");
+  if (err) return consola.error(err);
+  return consola.success("Copied files into package.");
 });
 
 // Read filenames to derive the following information
@@ -34,7 +35,7 @@ glob(`${fontFileDir}/**/*.woff2`, {}, (err, files) => {
   let weights: number[] = [];
   let styles: string[] = [];
 
-  files.forEach(file => {
+  for (const file of files) {
     // Remove file path and extension.
     // 23 characters to account for scripts / generic /...filepath, -6 for .woff2
     const name = file.slice(23 + fontId.length, -6).split("-");
@@ -43,13 +44,13 @@ glob(`${fontFileDir}/**/*.woff2`, {}, (err, files) => {
     weights.push(Number(name.slice(-1)[0]));
     name.pop();
     subsets.push(name.join("-"));
-  });
+  }
   subsets = [...new Set(subsets)];
   weights = [...new Set(weights)];
   styles = [...new Set(styles)];
 
   if (err) {
-    console.error(err);
+    consola.error(err);
   }
 
   // Create object to store all necessary data to run package function
@@ -78,5 +79,5 @@ glob(`${fontFileDir}/**/*.woff2`, {}, (err, files) => {
   // Generate files (false for rebuildFlag)
   packager(fontObject, false);
 
-  console.log(`Finished processing ${fontId}.`);
+  consola.success(`Finished processing ${fontId}.`);
 });

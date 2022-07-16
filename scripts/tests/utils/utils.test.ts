@@ -1,11 +1,12 @@
 import mock from "mock-fs";
+
 import {
   findClosest,
+  getDirectories,
   makeFontDownloadPath,
   makeFontFilePath,
   makeVariableFontDownloadPath,
   makeVariableFontFilePath,
-  getDirectories,
 } from "../../utils/utils";
 
 const fontDir = "fonts/google/noto-sans-jp";

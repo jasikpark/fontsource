@@ -30,7 +30,7 @@ const weightNum = [
 ];
 
 const parser = (files: string[]) => {
-  files.forEach(file => {
+  for (const file of files) {
     const lowerCaseFile = file.toLowerCase();
     for (const [index] of weightNames.entries()) {
       const fileNew = lowerCaseFile.replace(
@@ -44,19 +44,19 @@ const parser = (files: string[]) => {
         // Continue
       }
     }
-  });
+  }
 };
 
 const fontFileDir = `scripts/generic/files`;
 
-glob(`${fontFileDir}/**/*.woff2`, {}, (err, files) => {
+glob(`${fontFileDir}/**/*.woff2`, {}, (_err, files) => {
   parser(files);
 });
 
-glob(`${fontFileDir}/**/*.woff`, {}, (err, files) => {
+glob(`${fontFileDir}/**/*.woff`, {}, (_err, files) => {
   parser(files);
 });
 
-glob(`${fontFileDir}/**/*.ttf`, {}, (err, files) => {
+glob(`${fontFileDir}/**/*.ttf`, {}, (_err, files) => {
   parser(files);
 });

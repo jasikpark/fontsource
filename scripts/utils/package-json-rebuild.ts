@@ -1,10 +1,11 @@
 import fs from "fs-extra";
 import jsonfile from "jsonfile";
+
 import { getDirectories } from "./utils";
 
 const packageRewrite = (type: string) => {
   const directories = getDirectories(type);
-  directories.forEach(directory => {
+  for (const directory of directories) {
     const fontDir = `./fonts/${type}/${directory}`;
     const metadata = jsonfile.readFileSync(`${fontDir}/metadata.json`);
     const packageJSON = jsonfile.readFileSync(`${fontDir}/package.json`);
@@ -27,7 +28,7 @@ const packageRewrite = (type: string) => {
         directory: `fonts/${type}/${metadata.fontId}`,
       },
     });
-  });
+  }
 };
 
 packageRewrite("google");

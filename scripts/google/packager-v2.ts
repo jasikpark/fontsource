@@ -2,7 +2,7 @@ import fs from "fs-extra";
 import { APIv2 } from "google-font-metadata";
 
 import { fontFace } from "../templates/css";
-import { makeFontFilePath, findClosest } from "../utils/utils";
+import { findClosest, makeFontFilePath } from "../utils/utils";
 
 const packagerV2 = (id: string): void => {
   const font = APIv2[id];
@@ -14,10 +14,10 @@ const packagerV2 = (id: string): void => {
   // Generate CSS
   const unicodeKeys = Object.keys(font.unicodeRange);
 
-  font.weights.forEach(weight => {
-    font.styles.forEach(style => {
+  for (const weight of font.weights) {
+    for (const style of font.styles) {
       const cssStyle: string[] = [];
-      unicodeKeys.forEach(subset => {
+      for (const subset of unicodeKeys) {
         // Some fonts may have variants 400, 400i, 700 but not 700i.
         if (style in font.variants[weight]) {
           const css = fontFace({
@@ -38,7 +38,7 @@ const packagerV2 = (id: string): void => {
           });
           cssStyle.push(css);
         }
-      });
+      }
       // Write down CSS
       if (style in font.variants[weight]) {
         if (style === "normal") {
@@ -55,8 +55,8 @@ const packagerV2 = (id: string): void => {
           fs.writeFileSync(cssStylePath, cssStyle.join(""));
         }
       }
-    });
-  });
+    }
+  }
 };
 
 export { packagerV2 };

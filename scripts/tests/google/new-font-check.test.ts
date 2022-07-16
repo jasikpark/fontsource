@@ -1,6 +1,6 @@
 import mock from "mock-fs";
 
-import { findDuplicates, deleteDuplicates } from "../../google/new-font-check";
+import { deleteDuplicates,findDuplicates } from "../../google/new-font-check";
 import { getDirectories } from "../../utils/utils";
 
 describe("New font check", () => {

@@ -13,9 +13,9 @@ const variable = (id: string): void => {
   const variableName = `${font.family}Variable`;
 
   // wghtOnly CSS Generation
-  font.styles.forEach(style => {
+  for (const style of font.styles) {
     const cssStyle: string[] = [];
-    font.subsets.forEach(subset => {
+    for (const subset of font.subsets) {
       const type = "wghtOnly";
       const cssWght = fontFaceVariable({
         fontId: font.id,
@@ -28,7 +28,7 @@ const variable = (id: string): void => {
         unicodeRange: font.unicodeRange[subset],
       });
       cssStyle.push(cssWght);
-    });
+    }
 
     // Write down CSS
     if (style === "normal") {
@@ -39,24 +39,23 @@ const variable = (id: string): void => {
       const cssStylePath = `${fontDir}/variable-${style}.css`;
       fs.writeFileSync(cssStylePath, cssStyle.join(""));
     }
-  });
+  }
 
   // full CSS Generation
   if ("full" in fontVariable.variants) {
     // Wdth requires a different CSS template (font-stretch)
     if ("wdth" in fontVariable.axes) {
-      font.styles.forEach(style => {
+      for (const style of font.styles) {
         // Preserve the 'normal' style as a flag
         const origStyle = style;
         let newStyle = style;
         if ("slnt" in fontVariable.axes && style === "normal") {
           // SLNT has a different style linked to it.
-          newStyle = `oblique ${Number(fontVariable.axes.slnt.max) * -1}deg ${
-            Number(fontVariable.axes.slnt.min) * -1
-          }deg`;
+          newStyle = `oblique ${Number(fontVariable.axes.slnt.max) * -1}deg ${Number(fontVariable.axes.slnt.min) * -1
+            }deg`;
         }
         const cssStyle: string[] = [];
-        font.subsets.forEach(subset => {
+        for (const subset of font.subsets) {
           const type = "full";
           const cssWght = fontFaceVariableWdth({
             fontId: font.id,
@@ -75,7 +74,7 @@ const variable = (id: string): void => {
             unicodeRange: font.unicodeRange[subset],
           });
           cssStyle.push(cssWght);
-        });
+        }
 
         // Write down CSS
         if (origStyle === "normal") {
@@ -86,19 +85,18 @@ const variable = (id: string): void => {
           const cssStylePath = `${fontDir}/variable-full-${origStyle}.css`;
           fs.writeFileSync(cssStylePath, cssStyle.join(""));
         }
-      });
+      }
     } else {
-      font.styles.forEach(style => {
+      for (const style of font.styles) {
         const origStyle = style;
         let newStyle = style;
         if ("slnt" in fontVariable.axes && style === "normal") {
           // SLNT has a different style linked to it.
-          newStyle = `oblique ${Number(fontVariable.axes.slnt.max) * -1}deg ${
-            Number(fontVariable.axes.slnt.min) * -1
-          }deg`;
+          newStyle = `oblique ${Number(fontVariable.axes.slnt.max) * -1}deg ${Number(fontVariable.axes.slnt.min) * -1
+            }deg`;
         }
         const cssStyle: string[] = [];
-        font.subsets.forEach(subset => {
+        for (const subset of font.subsets) {
           const type = "full";
           const cssWght = fontFaceVariable({
             fontId: font.id,
@@ -116,7 +114,7 @@ const variable = (id: string): void => {
             unicodeRange: font.unicodeRange[subset],
           });
           cssStyle.push(cssWght);
-        });
+        }
 
         // Write down CSS
         if (origStyle === "normal") {
@@ -127,7 +125,7 @@ const variable = (id: string): void => {
           const cssStylePath = `${fontDir}/variable-full-${origStyle}.css`;
           fs.writeFileSync(cssStylePath, cssStyle.join(""));
         }
-      });
+      }
     }
   }
 };

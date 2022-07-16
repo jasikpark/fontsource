@@ -1,8 +1,9 @@
-import { readConfig } from "mass-publish/lib/changed/read-config";
-import { findDiff } from "mass-publish/lib/changed/find-diff";
+import consola from "consola"
 import fs from "fs-extra";
-import path from "node:path";
 import jsonfile from "jsonfile";
+import { findDiff } from "mass-publish/lib/changed/find-diff";
+import { readConfig } from "mass-publish/lib/changed/read-config";
+import path from "node:path";
 
 /**
  * Returns a list of directory paths of packages that have changed.
@@ -46,7 +47,7 @@ const downloadFileCheck = (
         if (throwError) {
           throw new Error(message);
         } else {
-          console.log(message);
+          consola.info(message);
           fontIds.push(path.basename(changedPackage));
         }
       }
@@ -63,7 +64,7 @@ const downloadFileCheck = (
           if (throwError) {
             throw new Error(message);
           } else {
-            console.log(`${file} does not exist`);
+            consola.error(`${file} does not exist`);
             fontIds.push(path.basename(changedPackage));
           }
         }

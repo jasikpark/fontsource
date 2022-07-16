@@ -1,13 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import testData from "./data/download-file-data.json";
-
 import {
   download,
   filterLinks,
-  variableLinks,
-  pairGenerator,
   gotDownload,
+  pairGenerator,
+  variableLinks,
 } from "../../google/download-file";
+import testData from "./data/download-file-data.json";
 
 jest.mock("google-font-metadata");
 

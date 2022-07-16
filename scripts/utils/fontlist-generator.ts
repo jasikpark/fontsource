@@ -1,6 +1,7 @@
-import * as _ from "lodash";
+import consola from "consola"
 import fs from "fs-extra";
 import jsonfile from "jsonfile";
+import * as _ from "lodash";
 
 import { getDirectories } from "./utils";
 
@@ -21,7 +22,7 @@ interface Metadata {
 // Iterate through directories and push to relevant arrays
 const pushFonts = (type: string) => {
   const directories = getDirectories(type);
-  directories.forEach(directory => {
+  for (const directory of directories) {
     const fontDir = `./fonts/${type}/${directory}`;
 
     try {
@@ -49,13 +50,13 @@ const pushFonts = (type: string) => {
           break;
         }
         default: {
-          console.log(`${metadata.fontId} has unknown type ${metadata.type}.`);
+          consola.error(`${metadata.fontId} has unknown type ${metadata.type}.`);
         }
       }
     } catch (error) {
-      console.error(error);
+      consola.error(error);
     }
-  });
+  }
 };
 
 pushFonts("google");

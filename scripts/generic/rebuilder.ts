@@ -1,8 +1,9 @@
+import consola from "consola"
 import fs from "fs-extra";
 import jsonfile from "jsonfile";
 
-import { packager } from "./generic-packager";
 import { getDirectories } from "../utils/utils";
+import { packager } from "./generic-packager";
 
 interface Metadata {
   fontId: string;
@@ -26,7 +27,7 @@ interface UnicodeRange {
 
 const rebuild = (type: string) => {
   const directories = getDirectories(type);
-  directories.forEach(directory => {
+  for (const directory of directories) {
     const fontDir = `./fonts/${type}/${directory}`;
     try {
       const metadata: Metadata = jsonfile.readFileSync(
@@ -58,7 +59,7 @@ const rebuild = (type: string) => {
           fontId: metadata.fontId,
           fontName: metadata.fontName,
           subsets: metadata.subsets,
-          weights: metadata.weights.map(weight => Number(weight)),
+          weights: metadata.weights.map(Number),
           styles: metadata.styles,
           defSubset: metadata.defSubset,
           unicodeRange,
@@ -77,12 +78,12 @@ const rebuild = (type: string) => {
         // Generate files (true for rebuildFlag)
         packager(fontObject, true);
 
-        console.log(`Finished processing ${metadata.fontId}.`);
+        consola.success(`Finished processing ${metadata.fontId}.`);
       }
     } catch (error) {
-      console.error(error);
+      consola.error(error);
     }
-  });
+  }
 };
 
 rebuild("league");

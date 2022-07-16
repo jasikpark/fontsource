@@ -1,15 +1,14 @@
 import fs from "fs-extra";
-import jsonfile from "jsonfile";
 import glob from "glob";
+import jsonfile from "jsonfile";
 
-import { makeFontFilePath, findClosest } from "../utils/utils";
-
+import { changelog } from "../templates/changelog";
 import { fontFace } from "../templates/css";
-import { scssGeneric } from "../templates/scss";
+import { materialIcons } from "../templates/icons";
 import { packageJson } from "../templates/package";
 import { readme } from "../templates/readme";
-import { changelog } from "../templates/changelog";
-import { materialIcons } from "../templates/icons";
+import { scssGeneric } from "../templates/scss";
+import { findClosest, makeFontFilePath } from "../utils/utils";
 
 interface Font {
   fontDir: string;
@@ -54,10 +53,10 @@ const packager = (font: Font, rebuildFlag: boolean): void => {
   const indexWeight = findClosest(weights, 400);
 
   // Generate CSS files
-  subsets.forEach(subset => {
+  for (const subset of subsets) {
     const cssSubset: string[] = [];
-    weights.forEach(weight => {
-      styles.forEach(style => {
+    for (const weight of weights) {
+      for (const style of styles) {
         const cssStyle = [];
         const css = fontFace({
           fontId,
@@ -99,14 +98,14 @@ const packager = (font: Font, rebuildFlag: boolean): void => {
             fs.writeFileSync(cssStylePath, cssFile);
           }
         }
-      });
+      }
 
       const fileContentSubset = cssSubset.join("");
       // subset.css
       const cssPath = `${fontDir}/${subset}.css`;
       fs.writeFileSync(cssPath, fileContentSubset);
-    });
-  });
+    }
+  }
 
   // Write SCSS file
   fs.ensureDirSync(`./${fontDir}/scss`);
@@ -126,16 +125,16 @@ const packager = (font: Font, rebuildFlag: boolean): void => {
       fontName,
     });
     const files = glob.sync(`${fontDir}/**/*.{css,scss}`);
-    files.forEach(file => {
+    for (const file of files) {
       fs.appendFileSync(file, icons);
-    });
+    }
   }
 
   // Write file-list.json
   const fileList: string[] = [];
-  fs.readdirSync(`${fontDir}/files`).forEach(file => {
+  for (const file of fs.readdirSync(`${fontDir}/files`)) {
     fileList.push(`./fonts/${type}/${fontId}/files/${file}`);
-  });
+  }
   jsonfile.writeFileSync(`${fontDir}/files/file-list.json`, fileList);
 
   // Write README.md

@@ -1,6 +1,7 @@
 import algoliasearch from "algoliasearch";
-import jsonfile from "jsonfile";
+import consola from "consola"
 import * as dotenv from "dotenv";
+import jsonfile from "jsonfile";
 
 import { getDirectories } from "./utils";
 
@@ -14,7 +15,7 @@ const indexArray: Metadata[] = [];
 // Copy all metadatas into one array
 const pushMetadata = (type: string) => {
   const directories = getDirectories(type);
-  directories.forEach(directory => {
+  for (const directory of directories) {
     const fontDir = `./fonts/${type}/${directory}`;
     try {
       const metadata = jsonfile.readFileSync(`${fontDir}/metadata.json`);
@@ -24,9 +25,9 @@ const pushMetadata = (type: string) => {
       }
       indexArray.push(metadata);
     } catch (error) {
-      console.error(error);
+      consola.error(error);
     }
-  });
+  }
 };
 
 pushMetadata("google");
@@ -52,5 +53,6 @@ const index = client.initIndex("prod_FONTS");
 
 index
   .saveObjects(indexArray)
-  .then(() => console.log("Updated fonts."))
-  .catch(error => console.log(error));
+  .then(() => consola.success("Updated fonts."))
+  // eslint-disable-next-line unicorn/prefer-top-level-await
+  .catch(error => consola.error(error));

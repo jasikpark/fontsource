@@ -1,10 +1,11 @@
 import async from "async";
+import consola from "consola"
 import { APIv2 } from "google-font-metadata";
-
 import {
   downloadFileCheck,
   findChangedPackages,
 } from "scripts/utils/file-check";
+
 import { deleteDuplicates, duplicates } from "./new-font-check";
 import { run } from "./run";
 
@@ -15,9 +16,9 @@ import { run } from "./run";
  */
 const processQueueCheck = async (fontId: string) => {
   if (fontId in APIv2) {
-    console.log(`Downloading ${fontId} [QUEUECHECK]`);
+    consola.info(`Downloading ${fontId} [QUEUECHECK]`);
     await run(fontId, "force");
-    console.log(`Finished processing ${fontId} [QUEUECHECK]`);
+    consola.success(`Finished processing ${fontId} [QUEUECHECK]`);
   } else {
     throw new Error(`${fontId} not a Google Font! [QUEUECHECK]`);
   }
@@ -33,22 +34,22 @@ const queueCheck = async.queue(processQueueCheck, 1);
 
 // When queue is finished
 queueCheck.drain(async () => {
-  console.log("Re-checking all fonts... [QUEUECHECK]");
+  consola.info("Re-checking all fonts... [QUEUECHECK]");
   downloadFileCheck(await findChangedPackages(), true); // This time will throw and fail build if fails
-  console.log("Success. [QUEUECHECK]");
+  consola.success("Success. [QUEUECHECK]");
 });
 
 queueCheck.error((err, fontid) => {
-  console.error(`${fontid} experienced an error. [QUEUECHECK]`, err);
+  consola.error(`${fontid} experienced an error. [QUEUECHECK]`, err);
 });
 
 /**
  * Main function that runs when this file is called directly with ts-node. Driver logic.
  */
 const runChecks = async () => {
-  console.log("\nChecking font files...");
+  consola.info("\nChecking font files...");
   const changedPackages = downloadFileCheck(await findChangedPackages());
-  console.log(changedPackages);
+  consola.log(changedPackages);
   for (const changedPackage of changedPackages) {
     queueCheck.push(changedPackage);
   }
@@ -57,7 +58,7 @@ const runChecks = async () => {
   // This deletes the duplicate font
   const deletedDuplicates = deleteDuplicates(duplicates);
   if (deletedDuplicates.length > 0)
-    console.log(`Deleted duplicate fonts ${deletedDuplicates}.`);
+    consola.success(`Deleted duplicate fonts ${deletedDuplicates}.`);
 };
 
 runChecks();

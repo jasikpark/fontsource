@@ -1,14 +1,15 @@
-import _ from "lodash";
 import async from "async";
+import consola from "consola"
 import flatten from "flat";
 import fs from "fs-extra";
-import isAbsoluteUrl from "is-absolute-url";
+import type { FontVariants, FontVariantsVariable } from "google-font-metadata";
 import { APIv1, APIv2, APIVariable } from "google-font-metadata";
 import got from "got";
-import { EventEmitter } from "events";
-
-import type { FontVariants, FontVariantsVariable } from "google-font-metadata";
+import isAbsoluteUrl from "is-absolute-url";
 import jsonfile from "jsonfile";
+import _ from "lodash";
+import { EventEmitter } from "node:events";
+
 import {
   makeFontDownloadPath,
   makeVariableFontDownloadPath,
@@ -19,7 +20,7 @@ const gotDownload = async (url: string, dest: fs.PathLike): Promise<void> => {
     const response = await got(url).buffer();
     fs.writeFileSync(dest, response);
   } catch (error) {
-    console.log(error);
+    consola.error(error);
   }
 };
 
@@ -65,11 +66,11 @@ const filterLinks = (fontId: string): DownloadLinks[] => {
   // Flag to check whether font has unicode subsets like [132]
   let hasUnicodeSubsets = false;
   const re = /\[.*?]/g;
-  downloadURLPairsV2.forEach(pair => {
+  for (const pair of downloadURLPairsV2) {
     if (re.test(pair[0][2])) {
       hasUnicodeSubsets = true;
     }
-  });
+  }
 
   // If true, we need to download the woff2 files from V1. Else remove all woff2 files
   if (!hasUnicodeSubsets) {
@@ -84,29 +85,27 @@ const filterLinks = (fontId: string): DownloadLinks[] => {
     const dest =
       types[4] === "woff2"
         ? makeFontDownloadPath(
-            fontDir,
-            fontId,
-            types[2].replace("[", "").replace("]", ""),
-            Number(types[0]),
-            types[1],
-            types[4]
-          )
+          fontDir,
+          fontId,
+          types[2].replace("[", "").replace("]", ""),
+          Number(types[0]),
+          types[1],
+          types[4]
+        )
         : makeFontDownloadPath(
-            fontDir,
-            fontId,
-            "all",
-            Number(types[0]),
-            types[1],
-            types[4]
-          );
+          fontDir,
+          fontId,
+          "all",
+          Number(types[0]),
+          types[1],
+          types[4]
+        );
     const url = pair[1];
     return { url, dest };
   });
 
   // The "all" subset generates duplicates which need to be removed
-  const linksV2 = _.uniqBy(linksV2Duplicates, item => {
-    return item.url && item.dest;
-  });
+  const linksV2 = _.uniqBy(linksV2Duplicates, item => item.url && item.dest);
 
   // V2 { url, dest } pairs
   const linksV1 = downloadURLPairsV1.map(pair => {
@@ -180,7 +179,7 @@ const download = async (fontId: string, isVariable: boolean): Promise<void> => {
   // Add variable font URLs to the links array
   if (isVariable) {
     const variable = variableLinks(fontId);
-    variable.forEach(link => links.push(link));
+    for (const link of variable) links.push(link);
   }
 
   // Download all font files
@@ -195,4 +194,4 @@ const download = async (fontId: string, isVariable: boolean): Promise<void> => {
   await jsonfile.writeFile(`./${fontDir}/files/file-list.json`, destArr);
 };
 
-export { download, gotDownload, pairGenerator, filterLinks, variableLinks };
+export { download, filterLinks, gotDownload, pairGenerator, variableLinks };

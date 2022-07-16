@@ -1,8 +1,8 @@
-import fs from "node:fs";
-
-import _ from "lodash";
-import path from "node:path";
+import consola from "consola"
 import jsonfile from "jsonfile";
+import _ from "lodash";
+import fs from "node:fs";
+import path from "node:path";
 import { getDirectories } from "scripts/utils/utils";
 
 /**
@@ -38,7 +38,7 @@ const duplicates = findDuplicates(directories);
  * @returns
  */
 const deleteDuplicates = (duplicateDirs: string[]): string[] => {
-  duplicateDirs.forEach(dir => {
+  for (const dir of duplicateDirs) {
     let packageJson;
     try {
       // Check other directory
@@ -64,7 +64,7 @@ const deleteDuplicates = (duplicateDirs: string[]): string[] => {
         throw new Error(`Unable to find dir ${dir}`);
       }
     } catch {
-      console.error(`Error while deleting ${dir}.`);
+      consola.error(`Error while deleting ${dir}.`);
     }
 
     // This is necessary as the newly generated Google package version will not match the existing NPM version
@@ -76,8 +76,8 @@ const deleteDuplicates = (duplicateDirs: string[]): string[] => {
       path.join("fonts", "google", dir, "package.json"),
       packageJsonGoogle
     );
-  });
+  }
   return duplicateDirs;
 };
 
-export { directories, duplicates, findDuplicates, deleteDuplicates };
+export { deleteDuplicates, directories, duplicates, findDuplicates };

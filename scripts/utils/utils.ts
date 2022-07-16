@@ -9,9 +9,7 @@ const makeFontDownloadPath = (
   weight: number,
   style: string,
   extension: string
-): string => {
-  return `./${fontDir}/files/${fontId}-${subset}-${weight}-${style}.${extension}`;
-};
+): string => `./${fontDir}/files/${fontId}-${subset}-${weight}-${style}.${extension}`;
 
 const makeVariableFontDownloadPath = (
   fontDir: string,
@@ -19,9 +17,7 @@ const makeVariableFontDownloadPath = (
   subset: string,
   type: string,
   style: string
-): string => {
-  return `./${fontDir}/files/${fontId}-${subset}-variable-${type}-${style}.woff2`;
-};
+): string => `./${fontDir}/files/${fontId}-${subset}-variable-${type}-${style}.woff2`;
 
 // Used for the CSS filepaths
 const makeFontFilePath = (
@@ -30,18 +26,14 @@ const makeFontFilePath = (
   weight: number,
   style: string,
   extension: string
-): string => {
-  return `./files/${fontId}-${subset}-${weight}-${style}.${extension}`;
-};
+): string => `./files/${fontId}-${subset}-${weight}-${style}.${extension}`;
 
 const makeVariableFontFilePath = (
   fontId: string,
   subset: string,
   type: string,
   style: string
-): string => {
-  return `./files/${fontId}-${subset}-variable-${type}-${style}.woff2`;
-};
+): string => `./files/${fontId}-${subset}-variable-${type}-${style}.woff2`;
 
 // Insert a weight array to find the closest number given num - used for index.css gen
 const findClosest = (arr: number[], num: number): number => {
@@ -62,10 +54,10 @@ const getDirectories = (type: string) =>
     .map(dirent => dirent.name);
 
 export {
+  findClosest,
+  getDirectories,
   makeFontDownloadPath,
   makeFontFilePath,
   makeVariableFontDownloadPath,
   makeVariableFontFilePath,
-  findClosest,
-  getDirectories,
 };

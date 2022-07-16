@@ -130,6 +130,7 @@ importers:
       '@types/node': ^18.0.4
       algoliasearch: ^4.12.2
       async: ^3.2.3
+      consola: ^2.15.3
       dotenv: ^16.0.0
       flat: ^5.0.2
       fs-extra: ^10.0.1
@@ -143,6 +144,7 @@ importers:
     dependencies:
       algoliasearch: 4.13.1
       async: 3.2.4
+      consola: 2.15.3
       dotenv: 16.0.1
       flat: 5.0.2
       fs-extra: 10.1.0

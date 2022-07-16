@@ -1,8 +1,9 @@
-import * as _ from "lodash";
 import async from "async";
+import consola from "consola"
 import fs from "fs-extra";
 import { APIv2, APIVariable } from "google-font-metadata";
-import { EventEmitter } from "events";
+import * as _ from "lodash";
+import { EventEmitter } from "node:events";
 
 import { run } from "./run";
 
@@ -18,9 +19,9 @@ fs.ensureDirSync("scripts/temp_packages");
  * @param fontId font to be processed
  */
 const processQueue = async (fontId: string) => {
-  console.log(`Downloading ${fontId}`);
+  consola.info(`Downloading ${fontId}`);
   await run(fontId, force);
-  console.log(`Finished processing ${fontId}`);
+  consola.success(`Finished processing ${fontId}`);
   Promise.resolve().catch(error => {
     throw error;
   });
@@ -32,16 +33,16 @@ EventEmitter.defaultMaxListeners = 0;
 const queue = async.queue(processQueue, 3);
 
 queue.drain(async () => {
-  console.log(
+  consola.success(
     `All ${Object.keys(APIv2).length} Google Fonts have been processed.`
   );
-  console.log(
+  consola.success(
     `${Object.keys(APIVariable).length} variable fonts have been processed.`
   );
 });
 
 queue.error((err, fontid) => {
-  console.error(`${fontid} experienced an error.`, err);
+  consola.error(`${fontid} experienced an error.`, err);
 });
 
 // Testing
