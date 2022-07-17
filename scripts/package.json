@@ -6,12 +6,8 @@
   "devDependencies": {
     "@types/async": "^3.2.12",
     "@types/flat": "^5.0.2",
-    "@types/fs-extra": "^9.0.13",
     "@types/glob": "^7.2.0",
-    "@types/jest": "^27.4.1",
-    "@types/jsonfile": "^6.1.0",
     "@types/lodash": "^4.14.179",
-    "@types/mock-fs": "^4.13.1",
     "@types/node": "^18.0.4",
     "typescript": "^4.6.2"
   },
@@ -21,13 +17,13 @@
     "consola": "^2.15.3",
     "dotenv": "^16.0.0",
     "flat": "^5.0.2",
-    "fs-extra": "^10.0.1",
     "glob": "^7.2.0",
     "google-font-metadata": "^4.0.2",
     "got": "^11.8.2",
     "is-absolute-url": "^3.0.3",
-    "jsonfile": "^6.1.0",
-    "lodash": "^4.17.21"
+    "json-stringify-pretty-compact": "^4.0.0",
+    "lodash": "^4.17.21",
+    "pathe": "^0.3.2"
   },
   "scripts": {
     "lint": "pnpm run lint:code && pnpm run lint:types",

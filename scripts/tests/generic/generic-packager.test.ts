@@ -1,8 +1,10 @@
-import jsonfile from "jsonfile";
-import mock from "mock-fs";
+import * as fs from "node:fs/promises"
+import { describe, expect, it, vi } from "vitest"
 
 import { packager } from "../../generic/generic-packager";
-import { readDir, readDirContents } from "../helpers";
+import { getFixturesFromMock } from '../helpers';
+
+vi.mock("node:fs/promises");
 
 const testFont = {
   fontId: "clear-sans",
@@ -46,49 +48,30 @@ const testIcon = {
 };
 
 describe("Generate Generic CSS", () => {
-  beforeEach(() => {
-    mock({
-      fonts: {
-        other: {
-          "clear-sans": {
-            files: {
-              "clear-sans-all-100-normal.woff": "",
-              "clear-sans-all-100-normal.woff2": "",
-              "clear-sans-all-300-normal.woff": "",
-              "clear-sans-all-300-normal.woff2": "",
-              "clear-sans-all-400-normal.woff": "",
-              "clear-sans-all-400-normal.woff2": "",
-              "clear-sans-all-400-italic.woff": "",
-              "clear-sans-all-400-italic.woff2": "",
-              "clear-sans-all-500-normal.woff": "",
-              "clear-sans-all-500-normal.woff2": "",
-              "clear-sans-all-500-italic.woff": "",
-              "clear-sans-all-500-italic.woff2": "",
-              "clear-sans-all-700-normal.woff": "",
-              "clear-sans-all-700-normal.woff2": "",
-              "clear-sans-all-700-italic.woff": "",
-              "clear-sans-all-700-italic.woff2": "",
-            },
-          },
-        },
-        icons: {
-          "material-icons": {
-            files: {
-              "material-icons-base-400-normal.woff": "",
-              "material-icons-base-400-normal.woff2": "",
-            },
-          },
-        },
-      },
-    });
-  });
 
-  test("Clear Sans CSS", () => {
-    packager(testFont, true);
-    const dirPath = "./fonts/other/clear-sans";
-    const fileNames = readDir(dirPath, "css");
+  it("Successfully processes Clear Sans CSS", async () => {
+    const files = ["clear-sans-all-100-normal.woff",
+      "clear-sans-all-100-normal.woff2",
+      "clear-sans-all-300-normal.woff",
+      "clear-sans-all-300-normal.woff2",
+      "clear-sans-all-400-normal.woff",
+      "clear-sans-all-400-normal.woff2",
+      "clear-sans-all-400-italic.woff",
+      "clear-sans-all-400-italic.woff2",
+      "clear-sans-all-500-normal.woff",
+      "clear-sans-all-500-normal.woff2",
+      "clear-sans-all-500-italic.woff",
+      "clear-sans-all-500-italic.woff2",
+      "clear-sans-all-700-normal.woff",
+      "clear-sans-all-700-normal.woff2",
+      "clear-sans-all-700-italic.woff",
+      "clear-sans-all-700-italic.woff2"]
+    // @ts-ignore - readdir can return string[] not just dirent[]
+    vi.mocked(fs.readdir).mockResolvedValue(files);
 
-    expect(fileNames).toEqual([
+    await packager(testFont, true);
+    // console.log(vi.mocked(fs.writeFileSync).mock.calls)
+    const fileNames = [
       "100-italic.css",
       "100.css",
       "300-italic.css",
@@ -111,53 +94,62 @@ describe("Generate Generic CSS", () => {
       "all-700.css",
       "all.css",
       "index.css",
-    ]);
+    ]
 
-    const cssContent = readDirContents(dirPath, fileNames);
-    const fileList = jsonfile.readFileSync(`${dirPath}/files/file-list.json`);
-    mock.restore();
-    const expectedCSSContent = readDirContents(
-      "./scripts/tests/generic/data/clear-sans",
-      fileNames
-    );
+    const extraNames = [...fileNames, "CHANGELOG.md",
+      "README.md",
+      "files/file-list.json",
+      "metadata.json",
+      "package.json",
+      "scss/mixins.scss",
+      "unicode.json"]
 
-    const expectedFileList = jsonfile.readFileSync(
-      "./scripts/tests/generic/data/clear-sans/files/file-list.json"
-    );
+    const filePaths = extraNames.map(file => `fonts/other/clear-sans/${file}`).sort();
+    expect(vi.mocked(fs.writeFile).mock.calls.map(tuple => tuple[0]).sort()).toEqual(filePaths)
 
-    expect(cssContent).toEqual(expectedCSSContent);
-    expect(fileList).toEqual(expectedFileList);
+    const cssContent = getFixturesFromMock("clear-sans", fileNames, vi.mocked(fs.writeFile).mock.calls);
+    for (const css of cssContent) {
+      expect(css[0]).toEqual(css[1]);
+    }
+
+    const fileList = getFixturesFromMock("clear-sans", ["files/file-list.json"], vi.mocked(fs.writeFile).mock.calls);
+    for (const fileListing of fileList)
+      expect(fileListing[0]).toEqual(fileListing[1]);
   });
 
-  test("Material Icons CSS", () => {
-    packager(testIcon, true);
-    const dirPath = "./fonts/icons/material-icons";
-    const fileNames = readDir(dirPath, "css");
+  it("Material Icons CSS", async () => {
+    const files = ["material-icons-base-400-normal.woff",
+      "material-icons-base-400-normal.woff2"]
+    // @ts-ignore - readdir can return string[] not just dirent[]
+    vi.mocked(fs.readdir).mockResolvedValue(files);
 
-    expect(fileNames).toEqual([
+    await packager(testIcon, true);
+    const fileNames = [
       "400.css",
       "base-400.css",
       "base.css",
       "index.css",
-    ]);
+    ];
 
-    const cssContent = readDirContents(dirPath, fileNames);
-    const fileList = jsonfile.readFileSync(`${dirPath}/files/file-list.json`);
-    mock.restore();
-    const expectedCSSContent = readDirContents(
-      "./scripts/tests/generic/data/material-icons",
-      fileNames
-    );
+    const extraNames = [...fileNames, "CHANGELOG.md",
+      "README.md",
+      "files/file-list.json",
+      "metadata.json",
+      "package.json",
+      "scss/mixins.scss",
+      "unicode.json"]
 
-    const expectedFileList = jsonfile.readFileSync(
-      "./scripts/tests/generic/data/material-icons/files/file-list.json"
-    );
+    const filePaths = extraNames.map(file => `fonts/icons/material-icons/${file}`).sort();
+    const mockCalls = vi.mocked(fs.writeFile).mock.calls;
+    expect(mockCalls.map(tuple => tuple[0]).sort()).toEqual(filePaths)
 
-    expect(cssContent).toEqual(expectedCSSContent);
-    expect(fileList).toEqual(expectedFileList);
-  });
+    const cssContent = getFixturesFromMock("material-icons", fileNames, mockCalls, "icons");
+    for (const css of cssContent) {
+      expect(css[0]).toContain(css[1]);
+    }
 
-  afterEach(() => {
-    mock.restore();
+    const fileList = getFixturesFromMock("material-icons", ["files/file-list.json"], mockCalls, "icons");
+    for (const fileListing of fileList)
+      expect(fileListing[0]).toEqual(fileListing[1]);
   });
 });

@@ -1,6 +1,7 @@
-import fs from "fs-extra";
+/* eslint-disable no-await-in-loop */
 import glob from "glob";
-import jsonfile from "jsonfile";
+import stringify from "json-stringify-pretty-compact";
+import * as fs from "node:fs/promises";
 
 import { changelog } from "../templates/changelog";
 import { fontFace } from "../templates/css";
@@ -29,7 +30,7 @@ interface Font {
   packageVersion: string | undefined;
 }
 
-const packager = (font: Font, rebuildFlag: boolean): void => {
+const packager = async (font: Font, rebuildFlag: boolean): Promise<void> => {
   const {
     fontDir,
     fontId,
@@ -77,38 +78,39 @@ const packager = (font: Font, rebuildFlag: boolean): void => {
         // If style isn't normal, only specify then.
         if (style === "normal") {
           let cssPath = `${fontDir}/${subset}-${weight}.css`;
-          fs.writeFileSync(cssPath, cssFile);
+          await fs.writeFile(cssPath, cssFile);
 
           // Write weight only CSS
           if (subset === defSubset) {
             cssPath = `${fontDir}/${weight}.css`;
-            fs.writeFileSync(cssPath, cssFile);
+            await fs.writeFile(cssPath, cssFile);
 
             // Write index.css
             if (weight === indexWeight) {
-              fs.writeFileSync(`${fontDir}/index.css`, cssStyle.join(""));
+              await fs.writeFile(`${fontDir}/index.css`, cssStyle.join(""));
             }
           }
         } else {
           let cssStylePath = `${fontDir}/${subset}-${weight}-${style}.css`;
-          fs.writeFileSync(cssStylePath, cssFile);
+          await fs.writeFile(cssStylePath, cssFile);
 
           if (subset === defSubset) {
             cssStylePath = `${fontDir}/${weight}-${style}.css`;
-            fs.writeFileSync(cssStylePath, cssFile);
+            await fs.writeFile(cssStylePath, cssFile);
           }
         }
       }
-
-      const fileContentSubset = cssSubset.join("");
-      // subset.css
-      const cssPath = `${fontDir}/${subset}.css`;
-      fs.writeFileSync(cssPath, fileContentSubset);
     }
+    const fileContentSubset = cssSubset.join("");
+    // subset.css
+    const cssPath = `${fontDir}/${subset}.css`;
+    await fs.writeFile(cssPath, fileContentSubset);
   }
 
+
   // Write SCSS file
-  fs.ensureDirSync(`./${fontDir}/scss`);
+  const scssDir = `./${fontDir}/scss`;
+  try { await fs.access(scssDir); } catch { await fs.mkdir(scssDir); }
 
   const scss = scssGeneric({
     fontId,
@@ -116,7 +118,7 @@ const packager = (font: Font, rebuildFlag: boolean): void => {
     defSubset,
   });
 
-  fs.writeFileSync(`${fontDir}/scss/mixins.scss`, scss);
+  await fs.writeFile(`${fontDir}/scss/mixins.scss`, scss);
 
   // Material Icons #152
   if (type === "icons") {
@@ -126,16 +128,17 @@ const packager = (font: Font, rebuildFlag: boolean): void => {
     });
     const files = glob.sync(`${fontDir}/**/*.{css,scss}`);
     for (const file of files) {
-      fs.appendFileSync(file, icons);
+      await fs.appendFile(file, icons);
     }
   }
 
   // Write file-list.json
   const fileList: string[] = [];
-  for (const file of fs.readdirSync(`${fontDir}/files`)) {
+  for (const file of await fs.readdir(`${fontDir}/files`)) {
     fileList.push(`./fonts/${type}/${fontId}/files/${file}`);
   }
-  jsonfile.writeFileSync(`${fontDir}/files/file-list.json`, fileList);
+  // Sort to make results a bit more deterministic
+  await fs.writeFile(`${fontDir}/files/file-list.json`, stringify(fileList.sort()));
 
   // Write README.md
   const packageReadme = readme({
@@ -150,10 +153,10 @@ const packager = (font: Font, rebuildFlag: boolean): void => {
     version,
     type,
   });
-  fs.writeFileSync(`${fontDir}/README.md`, packageReadme);
+  await fs.writeFile(`${fontDir}/README.md`, packageReadme);
 
   // Write metadata.json
-  jsonfile.writeFileSync(`${fontDir}/metadata.json`, {
+  await fs.writeFile(`${fontDir}/metadata.json`, stringify({
     fontId,
     fontName,
     subsets,
@@ -167,13 +170,13 @@ const packager = (font: Font, rebuildFlag: boolean): void => {
     source,
     license,
     type,
-  });
+  }));
 
   // Write CHANGELOG.md
-  fs.writeFileSync(`${fontDir}/CHANGELOG.md`, changelog());
+  await fs.writeFile(`${fontDir}/CHANGELOG.md`, changelog());
 
   // Write unicode.json
-  jsonfile.writeFileSync(`${fontDir}/unicode.json`, unicodeRange);
+  await fs.writeFile(`${fontDir}/unicode.json`, stringify(unicodeRange));
 
   // Write out package.json file
   let packageJSON;
@@ -186,7 +189,7 @@ const packager = (font: Font, rebuildFlag: boolean): void => {
       type,
     });
   } else {
-    const mainRepoPackageJson = jsonfile.readFileSync("./package.json");
+    const mainRepoPackageJson = JSON.parse(JSON.stringify(await fs.readFile("./package.json")));
     packageJSON = packageJson({
       fontId,
       fontName,
@@ -194,7 +197,7 @@ const packager = (font: Font, rebuildFlag: boolean): void => {
       type,
     });
   }
-  fs.writeFileSync(`${fontDir}/package.json`, packageJSON);
+  await fs.writeFile(`${fontDir}/package.json`, packageJSON);
 };
 
 export { packager };

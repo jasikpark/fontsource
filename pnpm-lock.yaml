@@ -8,7 +8,6 @@ importers:
       dprint: ^0.30.3
       eslint: ^8.19.0
       mass-publish: ^1.1.2
-      mock-fs: ^5.1.2
       prettier: ^2.6.0
       tsx: ^3.8.0
       typescript: ^4.6.2
@@ -18,7 +17,6 @@ importers:
       dprint: 0.30.3
       eslint: 8.19.0
       mass-publish: 1.1.2
-      mock-fs: 5.1.2
       prettier: 2.7.1
       tsx: 3.8.0
       typescript: 4.7.4
@@ -121,25 +119,21 @@ importers:
     specifiers:
       '@types/async': ^3.2.12
       '@types/flat': ^5.0.2
-      '@types/fs-extra': ^9.0.13
       '@types/glob': ^7.2.0
-      '@types/jest': ^27.4.1
-      '@types/jsonfile': ^6.1.0
       '@types/lodash': ^4.14.179
-      '@types/mock-fs': ^4.13.1
       '@types/node': ^18.0.4
       algoliasearch: ^4.12.2
       async: ^3.2.3
       consola: ^2.15.3
       dotenv: ^16.0.0
       flat: ^5.0.2
-      fs-extra: ^10.0.1
       glob: ^7.2.0
       google-font-metadata: ^4.0.2
       got: ^11.8.2
       is-absolute-url: ^3.0.3
-      jsonfile: ^6.1.0
+      json-stringify-pretty-compact: ^4.0.0
       lodash: ^4.17.21
+      pathe: ^0.3.2
       typescript: ^4.6.2
     dependencies:
       algoliasearch: 4.13.1
@@ -147,22 +141,18 @@ importers:
       consola: 2.15.3
       dotenv: 16.0.1
       flat: 5.0.2
-      fs-extra: 10.1.0
       glob: 7.2.3
       google-font-metadata: 4.0.2
       got: 11.8.5
       is-absolute-url: 3.0.3
-      jsonfile: 6.1.0
+      json-stringify-pretty-compact: 4.0.0
       lodash: 4.17.21
+      pathe: 0.3.2
     devDependencies:
       '@types/async': 3.2.13
       '@types/flat': 5.0.2
-      '@types/fs-extra': 9.0.13
       '@types/glob': 7.2.0
-      '@types/jest': 27.5.2
-      '@types/jsonfile': 6.1.0
       '@types/lodash': 4.14.182
-      '@types/mock-fs': 4.13.1
       '@types/node': 18.0.4
       typescript: 4.7.4
 
@@ -2933,12 +2923,6 @@ packages:
     resolution: {integrity: sha512-3zsplnP2djeps5P9OyarTxwRpMLoe5Ash8aL9iprw0JxB+FAHjY+ifn4yZUuW4/9hqtnmor6uvjSRzJhiVbrEQ==}
     dev: true
 
-  /@types/fs-extra/9.0.13:
-    resolution: {integrity: sha512-nEnwB++1u5lVDM2UI4c1+5R+FYaKfaAzS4OococimjVm3nQw3TuzH5UNsocrcTBbhnerblyHj4A49qXbIiZdpA==}
-    dependencies:
-      '@types/node': 18.0.4
-    dev: true
-
   /@types/glob/7.2.0:
     resolution: {integrity: sha512-ZUxbzKl0IfJILTS6t7ip5fQQM/J3TJYubDm3nMbgubNNYS62eXeUpoLUC8/7fJNiFYHTrGPQn7hspDUzIHX3UA==}
     dependencies:
@@ -2990,12 +2974,6 @@ packages:
   /@types/json5/0.0.29:
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
 
-  /@types/jsonfile/6.1.0:
-    resolution: {integrity: sha512-zQPywzif9EycCkvECjYT9dbbttT0dkk657zcLb/803ZOXHsBA963jzEPF/Jnh1zOdBbgFJvUE8kcvZverAoK1w==}
-    dependencies:
-      '@types/node': 18.0.4
-    dev: true
-
   /@types/keyv/3.1.4:
     resolution: {integrity: sha512-BQ5aZNSCpj7D6K2ksrRCTmKRLEpnPvWDiLPfoGyhZ++8YtiK9d/3DBKPJgry359X/P1PfruyYwvnvwFjuEiEIg==}
     dependencies:
@@ -3026,12 +3004,6 @@ packages:
 
   /@types/minimatch/3.0.5:
     resolution: {integrity: sha512-Klz949h02Gz2uZCMGwDUSDS1YBlTdDDgbWHi+81l29tQALUtvz4rAYi5uoVhE5Lagoq6DeqAUlbrHvW/mXDgdQ==}
-    dev: true
-
-  /@types/mock-fs/4.13.1:
-    resolution: {integrity: sha512-m6nFAJ3lBSnqbvDZioawRvpLXSaPyn52Srf7OfzjubYbYX8MTUdIgDxQl0wEapm4m/pNYSd9TXocpQ0TvZFlYA==}
-    dependencies:
-      '@types/node': 18.0.4
     dev: true
 
   /@types/ms/0.7.31:
@@ -6395,6 +6367,7 @@ packages:
       graceful-fs: 4.2.10
       jsonfile: 6.1.0
       universalify: 2.0.0
+    dev: true
 
   /fs-extra/8.1.0:
     resolution: {integrity: sha512-yhlQgA6mnOJUKOsRUFsgJdQCvkKhcz8tlZG5HBQfReYZy46OwLcY+Zia0mtdHsOo9y/hP+CxMN0TU9QxoOtG4g==}
@@ -8545,11 +8518,6 @@ packages:
     resolution: {integrity: sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==}
     engines: {node: '>=10'}
     hasBin: true
-    dev: false
-
-  /mock-fs/5.1.2:
-    resolution: {integrity: sha512-YkjQkdLulFrz0vD4BfNQdQRVmgycXTV7ykuHMlyv+C8WCHazpkiQRDthwa02kSyo8wKnY9wRptHfQLgmf0eR+A==}
-    engines: {node: '>=12.0.0'}
     dev: false
 
   /moment-timezone/0.5.34:
