@@ -1,6 +1,5 @@
-/* eslint-disable no-restricted-syntax */
-import fs from "fs-extra";
 import glob from "glob";
+import fs from "node:fs/promises";
 
 const weightNames = [
   "thin",
@@ -29,7 +28,7 @@ const weightNum = [
   800, 800, 800, 700, 900,
 ];
 
-const parser = (files: string[]) => {
+const parser = async (files: string[]) => {
   for (const file of files) {
     const lowerCaseFile = file.toLowerCase();
     for (const [index] of weightNames.entries()) {
@@ -39,7 +38,8 @@ const parser = (files: string[]) => {
       );
 
       try {
-        fs.renameSync(file, fileNew);
+        // eslint-disable-next-line no-await-in-loop
+        await fs.rename(file, fileNew);
       } catch {
         // Continue
       }
@@ -49,14 +49,14 @@ const parser = (files: string[]) => {
 
 const fontFileDir = `scripts/generic/files`;
 
-glob(`${fontFileDir}/**/*.woff2`, {}, (_err, files) => {
-  parser(files);
+glob(`${fontFileDir}/**/*.woff2`, {}, async (_err, files) => {
+  await parser(files);
 });
 
-glob(`${fontFileDir}/**/*.woff`, {}, (_err, files) => {
-  parser(files);
+glob(`${fontFileDir}/**/*.woff`, {}, async (_err, files) => {
+  await parser(files);
 });
 
-glob(`${fontFileDir}/**/*.ttf`, {}, (_err, files) => {
-  parser(files);
+glob(`${fontFileDir}/**/*.ttf`, {}, async (_err, files) => {
+  await parser(files);
 });

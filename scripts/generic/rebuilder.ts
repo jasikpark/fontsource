@@ -1,8 +1,8 @@
+/* eslint-disable no-await-in-loop */
 import consola from "consola"
-import fs from "fs-extra";
-import jsonfile from "jsonfile";
+import fs from "node:fs/promises";
 
-import { getDirectories } from "../utils/utils";
+import { getDirectories, readParse } from "../utils/utils";
 import { packager } from "./generic-packager";
 
 interface Metadata {
@@ -25,34 +25,37 @@ interface UnicodeRange {
   [subset: string]: string;
 }
 
-const rebuild = (type: string) => {
-  const directories = getDirectories(type);
+const rebuild = async (type: string) => {
+  const directories = await getDirectories(type);
   for (const directory of directories) {
     const fontDir = `./fonts/${type}/${directory}`;
     try {
-      const metadata: Metadata = jsonfile.readFileSync(
+      const metadata: Metadata = await readParse(
         `${fontDir}/metadata.json`
       );
 
       let unicodeRange: UnicodeRange = {};
-      if (fs.existsSync(`${fontDir}/unicode.json`)) {
-        unicodeRange = jsonfile.readFileSync(`${fontDir}/unicode.json`);
+      try {
+        await fs.access(`${fontDir}/unicode.json`);
+        unicodeRange = await readParse(`${fontDir}/unicode.json`);
+      } catch {
+        // Continue
       }
-
       // Rebuild only non-Google fonts
       if (metadata.type !== "google") {
-        const packageJSONData = jsonfile.readFileSync(
+        const packageJSONData = await readParse(
           `${fontDir}/package.json`
         );
 
         // Clear directory
-        fs.copySync(`${fontDir}/files`, `./scripts/temp_packages/${directory}`);
-        fs.emptyDirSync(fontDir);
-        fs.copySync(
+        await fs.cp(`${fontDir}/files`, `./scripts/temp_packages/${directory}`);
+        await fs.rm(fontDir, { recursive: true, force: true });
+        await fs.mkdir(fontDir)
+        await fs.cp(
           `./scripts/temp_packages/${directory}`,
           `./${fontDir}/files`
         );
-        fs.removeSync(`./scripts/temp_packages/${directory}`);
+        await fs.rm(`./scripts/temp_packages/${directory}`, { recursive: true, force: true });
 
         // Create object to store all necessary data to run package function
         const fontObject = {
@@ -76,7 +79,7 @@ const rebuild = (type: string) => {
         };
 
         // Generate files (true for rebuildFlag)
-        packager(fontObject, true);
+        await packager(fontObject, true);
 
         consola.success(`Finished processing ${metadata.fontId}.`);
       }
@@ -86,6 +89,6 @@ const rebuild = (type: string) => {
   }
 };
 
-rebuild("league");
-rebuild("icons");
-rebuild("other");
+await rebuild("league");
+await rebuild("icons");
+await rebuild("other");

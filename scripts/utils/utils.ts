@@ -1,4 +1,5 @@
-import fs from "fs-extra";
+import fs from "node:fs/promises";
+import { join } from "pathe"
 
 // Generate filenames and paths
 // Used by the downloader into repo
@@ -47,11 +48,13 @@ const findClosest = (arr: number[], num: number): number => {
 };
 
 // Find names of all packages.
-const getDirectories = (type: string) =>
-  fs
-    .readdirSync(`./fonts/${type}`, { withFileTypes: true })
-    .filter(dirent => dirent.isDirectory())
-    .map(dirent => dirent.name);
+const getDirectories = async (type: string) => {
+  const dir = await fs.readdir(`./fonts/${type}`, { withFileTypes: true })
+  return dir.filter(dirent => dirent.isDirectory()).map(dirent => dirent.name);
+}
+
+const readParse = async (filePath: string) =>
+  JSON.parse(await fs.readFile(join(process.cwd(), filePath), "utf8"));
 
 export {
   findClosest,
@@ -60,4 +63,5 @@ export {
   makeFontFilePath,
   makeVariableFontDownloadPath,
   makeVariableFontFilePath,
+  readParse,
 };
