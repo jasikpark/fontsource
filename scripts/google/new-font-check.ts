@@ -1,9 +1,9 @@
-import consola from "consola"
-import jsonfile from "jsonfile";
+/* eslint-disable no-await-in-loop */
+import stringify from "json-stringify-pretty-compact";
 import _ from "lodash";
-import fs from "node:fs";
-import path from "node:path";
-import { getDirectories } from "scripts/utils/utils";
+import * as fs from "node:fs/promises";
+import * as path from "pathe"
+import { fileExists, getDirectories, readParse } from "scripts/utils/utils";
 
 /**
  * Google may sometimes push a new font that already exists in the generic folder
@@ -14,10 +14,10 @@ import { getDirectories } from "scripts/utils/utils";
  * Gets all directories in all font folders
  */
 const directories = [
-  ...getDirectories("google"),
-  ...getDirectories("league"),
-  ...getDirectories("icons"),
-  ...getDirectories("other"),
+  ...await getDirectories("google"),
+  ...await getDirectories("league"),
+  ...await getDirectories("icons"),
+  ...await getDirectories("other"),
 ];
 
 /**
@@ -33,51 +33,37 @@ const findDuplicates = (dirs: string[]) =>
 const duplicates = findDuplicates(directories);
 
 /**
- * Delete all the duplicate directories from the font folder
+ * Delete all the duplicate directories from the non-Google font folders and then modify the new Google package json version
  * @param duplicateDirs array of directory names
- * @returns
+ * @returns duplicateDirs
  */
-const deleteDuplicates = (duplicateDirs: string[]): string[] => {
+const deleteDuplicates = async (duplicateDirs: string[]) => {
   for (const dir of duplicateDirs) {
     let packageJson;
-    try {
-      // Check other directory
-      if (fs.existsSync(path.join("fonts", "other", dir))) {
-        packageJson = jsonfile.readFileSync(
-          path.join("fonts", "other", dir, "package.json")
-        );
-        fs.rmSync(path.join("fonts", "other", dir), { recursive: true });
 
-        // Check icons directory
-      } else if (fs.existsSync(path.join("fonts", "icons", dir))) {
-        packageJson = jsonfile.readFileSync(
-          path.join("fonts", "icons", dir, "package.json")
-        );
-        fs.rmSync(path.join("fonts", "icons", dir), { recursive: true });
-        // Check league directory
-      } else if (fs.existsSync(path.join("fonts", "league", dir))) {
-        packageJson = jsonfile.readFileSync(
-          path.join("fonts", "league", dir, "package.json")
-        );
-        fs.rmSync(path.join("fonts", "league", dir), { recursive: true });
-      } else {
-        throw new Error(`Unable to find dir ${dir}`);
-      }
-    } catch {
-      consola.error(`Error while deleting ${dir}.`);
+    const fontsDir = path.join("fonts", "other", dir)
+    const iconsDir = path.join("fonts", "icons", dir)
+    const leagueDir = path.join("fonts", "league", dir)
+
+    if (await fileExists(fontsDir)) {
+      packageJson = await readParse(path.join(fontsDir, "package.json"));
+      await fs.rm(fontsDir, { recursive: true });
+    } else if (await fileExists(iconsDir)) {
+      packageJson = await readParse(path.join(iconsDir, "package.json"));
+      await fs.rm(iconsDir, { recursive: true });
+    } else if (await fileExists(leagueDir)) {
+      packageJson = await readParse(path.join(leagueDir, "package.json"));
+      await fs.rm(leagueDir, { recursive: true });
+    } else {
+      throw new Error(`${dir} does not exist`);
     }
 
     // This is necessary as the newly generated Google package version will not match the existing NPM version
-    const packageJsonGoogle = jsonfile.readFileSync(
-      path.join("fonts", "google", dir, "package.json")
-    );
+    const googleDir = path.join("fonts", "google", dir, "package.json");
+    const packageJsonGoogle = await readParse(googleDir);
     packageJsonGoogle.version = packageJson.version;
-    jsonfile.writeFileSync(
-      path.join("fonts", "google", dir, "package.json"),
-      packageJsonGoogle
-    );
+    await fs.writeFile(googleDir, stringify(packageJsonGoogle));
   }
-  return duplicateDirs;
 };
 
 export { deleteDuplicates, directories, duplicates, findDuplicates };

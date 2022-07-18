@@ -1,9 +1,11 @@
+/* eslint-disable no-await-in-loop */
 import algoliasearch from "algoliasearch";
 import consola from "consola"
 import * as dotenv from "dotenv";
-import jsonfile from "jsonfile";
+import stringify from "json-stringify-pretty-compact";
+import * as fs from "node:fs/promises"
 
-import { getDirectories } from "./utils";
+import { getDirectories, readParse } from "./utils";
 
 interface Metadata {
   objectID: string;
@@ -13,12 +15,12 @@ interface Metadata {
 const indexArray: Metadata[] = [];
 
 // Copy all metadatas into one array
-const pushMetadata = (type: string) => {
+const pushMetadata = async (type: string) => {
   const directories = getDirectories(type);
-  for (const directory of directories) {
+  for (const directory of await directories) {
     const fontDir = `./fonts/${type}/${directory}`;
     try {
-      const metadata = jsonfile.readFileSync(`${fontDir}/metadata.json`);
+      const metadata = await readParse(`${fontDir}/metadata.json`);
       metadata.objectID = metadata.fontId;
       if (metadata.variable) {
         metadata.variable = true;
@@ -30,15 +32,15 @@ const pushMetadata = (type: string) => {
   }
 };
 
-pushMetadata("google");
-pushMetadata("league");
-pushMetadata("icons");
-pushMetadata("other");
+await pushMetadata("google");
+await pushMetadata("league");
+await pushMetadata("icons");
+await pushMetadata("other");
 
 // Written as it is used by the website getStaticPaths
-jsonfile.writeFileSync("./website/src/configs/algolia.json", indexArray);
+await fs.writeFile("./website/src/configs/algolia.json", stringify(indexArray));
 // Written for API usage
-jsonfile.writeFileSync("./website/public/algolia.json", indexArray);
+await fs.writeFile("./website/public/algolia.json", stringify(indexArray));
 
 // Initialise Algolia client
 if (process.env.NODE_ENV !== "production") {

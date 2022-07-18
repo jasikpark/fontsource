@@ -1,24 +1,24 @@
+/* eslint-disable no-await-in-loop */
 import consola from "consola"
-import jsonfile from "jsonfile";
-import path from "node:path";
+import * as path from "pathe";
 
-import { getDirectories } from "./utils";
+import { getDirectories, readParse } from "./utils";
 
 const subsets: string[] = [];
 
-const pushSubsets = (type: string) => {
-  const directories = getDirectories(type);
+const pushSubsets = async (type: string) => {
+  const directories = await getDirectories(type);
   for (const directory of directories) {
     const metadataPath = path.join("./fonts", type, directory, "metadata.json");
-    const metadata = jsonfile.readFileSync(metadataPath);
+    const metadata = await readParse(metadataPath);
     subsets.push(...metadata.subsets);
   }
 };
 
-pushSubsets("google");
-pushSubsets("league");
-pushSubsets("icons");
-pushSubsets("other");
+await pushSubsets("google");
+await pushSubsets("league");
+await pushSubsets("icons");
+await pushSubsets("other");
 
 const noDuplicateSubsets = new Set(subsets);
 

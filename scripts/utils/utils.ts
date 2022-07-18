@@ -56,7 +56,17 @@ const getDirectories = async (type: string) => {
 const readParse = async (filePath: string) =>
   JSON.parse(await fs.readFile(join(process.cwd(), filePath), "utf8"));
 
+const fileExists = async (filePath: string) => {
+  try {
+    await fs.access(filePath);
+    return true;
+  } catch {
+    return false
+  }
+}
+
 export {
+  fileExists,
   findClosest,
   getDirectories,
   makeFontDownloadPath,

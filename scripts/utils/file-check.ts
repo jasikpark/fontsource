@@ -1,9 +1,10 @@
+/* eslint-disable no-await-in-loop */
 import consola from "consola"
-import fs from "fs-extra";
-import jsonfile from "jsonfile";
 import { findDiff } from "mass-publish/lib/changed/find-diff";
 import { readConfig } from "mass-publish/lib/changed/read-config";
-import path from "node:path";
+import * as path from "pathe";
+
+import { fileExists, readParse } from "./utils";
 
 /**
  * Returns a list of directory paths of packages that have changed.
@@ -32,17 +33,17 @@ const findChangedPackages = async (
  * @param changedPackages A list of dirpaths to a changed package
  * @param throwError If it should throw an error
  */
-const downloadFileCheck = (
+const downloadFileCheck = async (
   changedPackages: string[],
   throwError?: boolean
-): string[] => {
+) => {
   const fontIds: string[] = [];
   for (const changedPackage of changedPackages) {
     // A changed package could be the removal of an entire package
     // Only count existing packages
-    if (fs.existsSync(path.join(changedPackage, "package.json"))) {
+    if (await fileExists(path.join(changedPackage, "package.json"))) {
       // Check if files directory exists
-      if (!fs.existsSync(path.join(changedPackage, "files"))) {
+      if (!await fileExists(path.join(changedPackage, "files"))) {
         const message = `${changedPackage}/files does not exist`;
         if (throwError) {
           throw new Error(message);
@@ -53,13 +54,13 @@ const downloadFileCheck = (
       }
 
       // Read file that compares
-      const files: string[] = jsonfile.readFileSync(
+      const files: string[] = await readParse(
         path.join(changedPackage, "files", "file-list.json")
       );
 
       // Check binary files
       for (const file of files) {
-        if (!fs.existsSync(file)) {
+        if (!await fileExists(file)) {
           const message = `${file} does not exist`;
           if (throwError) {
             throw new Error(message);

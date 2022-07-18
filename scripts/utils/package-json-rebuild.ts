@@ -1,16 +1,17 @@
-import fs from "fs-extra";
-import jsonfile from "jsonfile";
+/* eslint-disable no-await-in-loop */
+import stringify from "json-stringify-pretty-compact";
+import fs from "node:fs/promises";
 
-import { getDirectories } from "./utils";
+import { getDirectories, readParse } from "./utils";
 
-const packageRewrite = (type: string) => {
-  const directories = getDirectories(type);
+const packageRewrite = async (type: string) => {
+  const directories = await getDirectories(type);
   for (const directory of directories) {
     const fontDir = `./fonts/${type}/${directory}`;
-    const metadata = jsonfile.readFileSync(`${fontDir}/metadata.json`);
-    const packageJSON = jsonfile.readFileSync(`${fontDir}/package.json`);
-    fs.removeSync(`${fontDir}/package.json`);
-    jsonfile.writeFileSync(`${fontDir}/package.json`, {
+    const metadata = await readParse(`${fontDir}/metadata.json`);
+    const packageJSON = await readParse(`${fontDir}/package.json`);
+    await fs.rm(`${fontDir}/package.json`);
+    await fs.writeFile(`${fontDir}/package.json`, stringify({
       name: packageJSON.name,
       version: packageJSON.version,
       description: `Self-host the ${metadata.fontName} font in a neatly bundled NPM package.`,
@@ -27,11 +28,11 @@ const packageRewrite = (type: string) => {
         url: "https://github.com/fontsource/fontsource.git",
         directory: `fonts/${type}/${metadata.fontId}`,
       },
-    });
+    }));
   }
 };
 
-packageRewrite("google");
-packageRewrite("league");
-packageRewrite("icons");
-packageRewrite("other");
+await packageRewrite("google");
+await packageRewrite("league");
+await packageRewrite("icons");
+await packageRewrite("other");

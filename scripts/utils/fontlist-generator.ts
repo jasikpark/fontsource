@@ -1,9 +1,10 @@
+/* eslint-disable no-await-in-loop */
 import consola from "consola"
-import fs from "fs-extra";
-import jsonfile from "jsonfile";
+import stringify from "json-stringify-pretty-compact";
 import * as _ from "lodash";
+import fs from "node:fs/promises";
 
-import { getDirectories } from "./utils";
+import { getDirectories, readParse } from "./utils";
 
 interface FontList {
   [x: string]: string;
@@ -20,13 +21,13 @@ interface Metadata {
 }
 
 // Iterate through directories and push to relevant arrays
-const pushFonts = (type: string) => {
-  const directories = getDirectories(type);
+const pushFonts = async (type: string) => {
+  const directories = await getDirectories(type);
   for (const directory of directories) {
     const fontDir = `./fonts/${type}/${directory}`;
 
     try {
-      const metadata: Metadata = jsonfile.readFileSync(
+      const metadata: Metadata = await readParse(
         `${fontDir}/metadata.json`
       );
       const object = { [metadata.fontId]: metadata.type };
@@ -59,13 +60,13 @@ const pushFonts = (type: string) => {
   }
 };
 
-pushFonts("google");
-pushFonts("league");
-pushFonts("icons");
-pushFonts("other");
+await pushFonts("google");
+await pushFonts("league");
+await pushFonts("icons");
+await pushFonts("other");
 
 // Write JSON list to be pulled externally.
-jsonfile.writeFile("FONTLIST.json", Object.assign({}, ...fontlist));
+await fs.writeFile("FONTLIST.json", stringify(Object.assign({}, ...fontlist)));
 
 // Write MD file
 const fontlistMarkdown = _.template(
@@ -100,4 +101,4 @@ const fontlistWrite = fontlistMarkdown({
   other,
 });
 
-fs.writeFileSync(`FONTLIST.md`, fontlistWrite);
+await fs.writeFile(`FONTLIST.md`, fontlistWrite);

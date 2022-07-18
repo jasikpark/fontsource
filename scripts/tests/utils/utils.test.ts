@@ -1,8 +1,9 @@
-import mock from "mock-fs";
+
+import { describe, expect, it } from "vitest"
 
 import {
   findClosest,
-  getDirectories,
+  // getDirectories, TODO
   makeFontDownloadPath,
   makeFontFilePath,
   makeVariableFontDownloadPath,
@@ -19,7 +20,7 @@ const extension = "woff2";
 const type = "full";
 
 describe("Font paths", () => {
-  test("Generate download paths", () => {
+  it("Generate download paths", () => {
     expect(
       makeFontDownloadPath(fontDir, fontId, subset, weight, style, extension)
     ).toBe(
@@ -33,7 +34,7 @@ describe("Font paths", () => {
     );
   });
 
-  test("Generate CSS paths", () => {
+  it("Generate CSS paths", () => {
     expect(makeFontFilePath(fontId, subset, weight, style, extension)).toBe(
       "./files/noto-sans-jp-latin-400-normal.woff2"
     );
@@ -45,11 +46,11 @@ describe("Font paths", () => {
 });
 
 describe("Find closest available weights", () => {
-  test("400 is available", () => {
+  it("400 is available", () => {
     expect(findClosest([300, 400, 500], 400)).toBe(400);
   });
 
-  test("400 is not available", () => {
+  it("400 is not available", () => {
     // Rounds down by default
     expect(findClosest([200, 300, 500, 600], 400)).toBe(300);
     expect(findClosest([200], 400)).toBe(200);
@@ -57,8 +58,8 @@ describe("Find closest available weights", () => {
   });
 });
 
-describe("Get directories", () => {
-  beforeEach(() => {
+describe.todo("Get directories", () => {
+  /* beforeEach(() => {
     mock({
       fonts: {
         google: {
@@ -94,9 +95,5 @@ describe("Get directories", () => {
       "not-cabin",
       "noto-sans-jp",
     ]);
-  });
-
-  afterEach(() => {
-    mock.restore();
-  });
+  }); */
 });
