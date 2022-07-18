@@ -1,6 +1,6 @@
 /* eslint-disable no-await-in-loop */
 import consola from "consola"
-import fs from "node:fs/promises";
+import * as fs from "node:fs/promises";
 
 import { getDirectories, readParse } from "../utils/utils";
 import { packager } from "./generic-packager";

@@ -1,6 +1,6 @@
 import consola from "consola"
 import glob from "glob";
-import fs from "node:fs/promises";
+import * as fs from "node:fs/promises";
 
 import { config } from "./config";
 import { packager } from "./generic-packager";

@@ -1,5 +1,5 @@
 import glob from "glob";
-import fs from "node:fs/promises";
+import * as fs from "node:fs/promises";
 
 const weightNames = [
   "thin",

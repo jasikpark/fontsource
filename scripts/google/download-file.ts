@@ -1,24 +1,24 @@
 import async from "async";
 import consola from "consola"
 import flatten from "flat";
-import fs from "fs-extra";
 import type { FontVariants, FontVariantsVariable } from "google-font-metadata";
 import { APIv1, APIv2, APIVariable } from "google-font-metadata";
 import got from "got";
 import isAbsoluteUrl from "is-absolute-url";
-import jsonfile from "jsonfile";
+import stringify from "json-stringify-pretty-compact";
 import _ from "lodash";
 import { EventEmitter } from "node:events";
+import * as fs from "node:fs/promises";
 
 import {
   makeFontDownloadPath,
   makeVariableFontDownloadPath,
 } from "../utils/utils";
 
-const gotDownload = async (url: string, dest: fs.PathLike): Promise<void> => {
+const gotDownload = async (url: string, dest: string): Promise<void> => {
   try {
     const response = await got(url).buffer();
-    fs.writeFileSync(dest, response);
+    await fs.writeFile(dest, response);
   } catch (error) {
     consola.error(error);
   }
@@ -172,8 +172,12 @@ const queue = async.queue(downloadQueue, 60);
 
 const download = async (fontId: string, isVariable: boolean): Promise<void> => {
   const fontDir = `fonts/google/${fontId}`;
-
-  await fs.ensureDir(`./${fontDir}/files`);
+  const filesDir = `./${fontDir}/files`
+  try {
+    await fs.access(filesDir);
+  } catch {
+    await fs.mkdir(filesDir);
+  }
 
   const links = filterLinks(fontId);
   // Add variable font URLs to the links array
@@ -191,7 +195,7 @@ const download = async (fontId: string, isVariable: boolean): Promise<void> => {
   }
 
   await queue.drain();
-  await jsonfile.writeFile(`./${fontDir}/files/file-list.json`, destArr);
+  await fs.writeFile(`./${fontDir}/files/file-list.json`, stringify(destArr));
 };
 
 export { download, filterLinks, gotDownload, pairGenerator, variableLinks };

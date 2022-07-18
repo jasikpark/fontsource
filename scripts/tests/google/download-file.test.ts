@@ -1,4 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import * as gfm from "google-font-metadata"
+import { describe, expect, it, vi } from "vitest"
+
 import {
   download,
   filterLinks,
@@ -7,37 +10,38 @@ import {
   variableLinks,
 } from "../../google/download-file";
 import testData from "./data/download-file-data.json";
+import APIv1Test from "./data/google-fonts-v1.json"
+import APIv2Test from "./data/google-fonts-v2.json"
+import APIVariableTest from "./data/variable.json"
 
-jest.mock("google-font-metadata");
+vi.mock("google-font-metadata");
 
 describe("Pair generator", () => {
-  afterEach(() => jest.resetAllMocks());
 
-  // Has TTF
-  const { APIv1Variant } = testData;
-  // OpenType
-  const { APIv2Variant } = testData;
-  // Variable fonts
-  const { APIVariableVariant } = testData;
+  // Has TTF + OpenType and Variable
+  const { APIv1Variant, APIv2Variant, APIVariableVariant } = testData;
 
-  test("APIv1 and strip TTF links", () => {
+  it("APIv1 and strip TTF links", () => {
     const { APIv1Result } = testData;
     expect(pairGenerator(APIv1Variant)).toEqual(APIv1Result);
   });
 
-  test("APIv2 and strip OTF links", () => {
+  it("APIv2 and strip OTF links", () => {
     const { APIv2Result } = testData;
     expect(pairGenerator(APIv2Variant)).toEqual(APIv2Result);
   });
 
-  test("APIVariable", () => {
+  it("APIVariable", () => {
     const { APIVariableResult } = testData;
     expect(pairGenerator(APIVariableVariant)).toEqual(APIVariableResult);
   });
 });
 
 describe("Filter links", () => {
-  test("Normal filterLinks function", () => {
+  it("Normal filterLinks function", () => {
+    vi.spyOn(gfm, "APIv1", "get").mockReturnValue(APIv1Test as gfm.FontObjectV1)
+    vi.spyOn(gfm, "APIv2", "get").mockReturnValue(APIv2Test as gfm.FontObjectV2)
+
     const abelResult = testData.filter.abel;
     expect(filterLinks("abel")).toEqual(abelResult);
 
@@ -45,7 +49,8 @@ describe("Filter links", () => {
     expect(filterLinks("noto-sans-jp")).toEqual(notoSansJPResult);
   });
 
-  test("Variable filterLinks function", () => {
+  it("Variable filterLinks function", () => {
+    vi.spyOn(gfm, "APIVariable", "get").mockReturnValue(APIVariableTest as gfm.FontObjectVariable)
     const cabinResult = testData.variableFilter.cabin;
     expect(variableLinks("cabin")).toEqual(cabinResult);
   });
