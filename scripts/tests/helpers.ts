@@ -30,13 +30,13 @@ export const readDirContents = (dirPath: string, fileNames: string[]): string[] 
   return fileContents;
 }; */
 
-export const getFixturePath = (fontId: string, fileName: string) => path.join(path.dirname(fileURLToPath(import.meta.url)), `./generic/data/${fontId}/${fileName}`)
-export const getFixture = (fontId: string, fileName: string) => fs.readFileSync(getFixturePath(fontId, fileName), "utf8")
+export const getFixturePath = (fontId: string, fileName: string, type: string) => path.join(path.dirname(fileURLToPath(import.meta.url)), `./${type}/data/${fontId}/${fileName}`)
+export const getFixture = (fontId: string, fileName: string, type: string) => fs.readFileSync(getFixturePath(fontId, fileName, type), "utf8")
 
-export const getFixturesFromMock = (fontId: string, fileNames: string[], mockCalls: any[], type = "other") => {
+export const getFixturesFromMock = (fontId: string, fileNames: string[], mockCalls: any[], type = "other", category = "generic") => {
   const results: string[][] = [];
   for (const fileName of fileNames) {
-    const fixture = getFixture(fontId, fileName);
+    const fixture = getFixture(fontId, fileName, category);
     const mockPath = `fonts/${type}/${fontId}/${fileName}`
     const mockCall = mockCalls.find(call => call[0] === mockPath);
     if (mockCall === undefined) {
